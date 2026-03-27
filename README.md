@@ -1,6 +1,6 @@
 # CivicTrack – AI-Based Civic Issue Reporting System
 
-## 🌐 Overview
+##  Overview
 
 CivicTrack is a full-stack web application designed to help citizens report civic issues such as potholes, garbage overflow, water leakage, and electricity problems.
 
@@ -8,7 +8,7 @@ The platform combines a modern frontend with an AI-assisted backend to simplify 
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
 ### 🔹 Dual Reporting Modes
 
@@ -66,7 +66,7 @@ The platform combines a modern frontend with an AI-assisted backend to simplify 
 
 ---
 
-## 🏗️ Project Structure
+##  Project Structure
 
 ```
 capstone shi/
@@ -92,9 +92,9 @@ capstone shi/
 
 ---
 
-## ⚙️ How It Works
+##  How It Works
 
-### 🔁 Workflow
+###  Workflow
 
 1. User opens CivicTrack website
 2. Selects **AI Detection Mode** or **Manual Mode**
@@ -127,7 +127,7 @@ capstone shi/
 
 ---
 
-## 🧪 Running the Project Locally
+##  Running the Project Locally
 
 ### 🔹 Step 1 — Clone Repository
 
@@ -171,7 +171,7 @@ Open `public/index.html` using:
 
 ---
 
-## ⚠️ Important Notes
+##  Important Notes
 
 * Flask backend must be running for AI detection to work
 * Frontend communicates with backend via API
@@ -180,7 +180,7 @@ Open `public/index.html` using:
 
 ---
 
-## 🎯 Project Objective
+##  Project Objective
 
 To build a smart civic reporting system that:
 
@@ -191,7 +191,7 @@ To build a smart civic reporting system that:
 
 ---
 
-## 🚀 Future Enhancements
+##  Future Enhancements
 
 * Deploy Flask backend (Render / Railway)
 * Real YOLO trained model integration
@@ -201,7 +201,7 @@ To build a smart civic reporting system that:
 
 ---
 
-## 👨‍💻 Tech Stack
+##  Tech Stack
 
 * **Frontend:** HTML, CSS, JavaScript
 * **Backend:** Flask (Python)
@@ -211,12 +211,12 @@ To build a smart civic reporting system that:
 
 ---
 
-## 📌 Conclusion
+##  Conclusion
 
 CivicTrack demonstrates how AI can be integrated into civic systems to automate issue detection and improve public service workflows.
 
 ---
 
-## 🙌 Acknowledgement
+##  Acknowledgement
 
 Developed as a capstone project to explore AI + Web integration for real-world problem solving.
