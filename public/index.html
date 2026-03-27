@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CivicTrack - Community Issue Tracker</title>
+
+  <!-- Fonts & CSS -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- React + Babel -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-container">
+      <div class="logo">
+        <div class="logo-icon">📍</div>
+        <div class="logo-text">
+          <h1>CivicTrack</h1>
+          <p>Community Issue Tracker</p>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; gap: 1rem;">
+        <button id="themeToggleBtn" title="Toggle Light/Dark Mode" style="background:none; border:none; font-size:1.5rem; cursor:pointer; transition:transform 0.3s ease;">🌞</button>
+        <nav class="nav" id="mainNav">
+          <button class="nav-btn" data-target="hero">Home</button>
+          <button class="nav-btn" data-target="issues-section">Issues</button>
+          <button class="nav-btn" data-target="report-section">Report</button>
+          <button class="btn-signin" id="signinBtn">Sign In</button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- HERO -->
+    <section id="hero" class="hero">
+      <h2>Report. Track. <span class="gradient-text">Resolve.</span></h2>
+      <p>A smart community-driven platform to report civic issues such as potholes, garbage, water leaks and more.</p>
+    </section>
+
+    <!-- ABOUT US SECTION 
+<section class="about-section">
+  <div class="about-content">
+    <h3 class="section-title">About Us</h3>
+    <p>
+      CivicTrack is a community-driven platform that empowers citizens to report,
+      track, and resolve civic issues such as potholes, garbage overflow, water leaks,
+      streetlight failures, and more.  
+      Our mission is to connect residents with local authorities for a cleaner,
+      safer, and more organized society.
+    </p>
+  </div>
+
+  <div class="about-slideshow">
+    <img class="about-slide fade" src="assets/about1.jpg" />
+    <img class="about-slide fade" src="assets/about2.jpg" />
+    <img class="about-slide fade" src="assets/about3.jpg" />
+    <img class="about-slide fade" src="assets/about4.jpg" />
+    <img class="about-slide fade" src="assets/about5.jpg" />
+  </div>
+</section>-->
+
+
+    
+
+    <!-- React App Root (we'll mount the app right after the Categories heading) -->
+    <div id="stats-root"></div>
+
+    <!-- CATEGORIES: keep heading here BEFORE React renders the filter -->
+    <h3 class="section-title" id="categories-title">Categories</h3>
+
+    <!-- NOTE: removed the separate categories-root here intentionally.
+         React will be mounted below (after the heading) so the heading
+         appears before the category buttons. -->
+
+    <!-- ISSUES: removed static Issues heading + issues-root here;
+         React will render the "Recent Issues" heading and the issues
+         grid inside the app (so the nav scroll target will be correct). -->
+    
+    <div class="mode-switch-wrapper" style="display:flex; justify-content:center; margin-top:2rem;">
+      <div class="mode-switch" id="modeSwitchContainer">
+        <div class="mode-slider" id="modeSlider"></div>
+        <button id="aiBtn" class="mode-btn active">🤖 AI Detection</button>
+        <button id="manualBtn" class="mode-btn">✍️ Manual Entry</button>
+      </div>
+    </div>
+
+    <!-- REPORT FORM -->
+    <h3 class="section-title" id="report-section" style="margin-top:4rem; text-align:center;">Report an Issue</h3>
+
+    <form class="report-form" id="reportForm" method="POST">
+      <div class="form-group">
+        <label class="form-label">Issue Title</label>
+        <input name="title"  id="title"   type="text" class="form-input" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select name="category" id="category" class="form-select">
+          <option>Roads</option>
+          <option>Garbage</option>
+          <option>Water Leakage</option>
+          <option>Electricity</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+
+      <div class="form-group" id="manualImageSection" style="display:none;">
+  <label class="form-label">Upload Image</label>
+  <input type="file" id="manualImageInput" accept="image/*">
+</div>
+
+
+      <div class="form-group" id="aiSection" style="display:block;">
+  <label class="form-label">🤖 AI Image Detection</label>
+  
+
+  <div class="upload-area">
+    <input type="file" id="imageInput" accept="image/*">
+    <p style="margin-top:10px;">Upload image to auto-detect issue</p>
+  </div>
+     
+  <p id="predictionResult" style="margin-top:10px; font-weight:600;"></p>
+</div>
+
+
+
+      <div class="form-group">
+        <label class="form-label">Location</label>
+        <input id="locationInput" name="location" type="text" class="form-input" placeholder="Search location..." required>
+<div id="suggestions" class="suggestions-box"></div>
+      </div>
+
+      
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea name="description" class="form-textarea" required></textarea>
+      </div>
+
+      <button type="button" class="btn-submit">Submit Issue</button>
+    </form>
+
+  </div>
+
+  
+   <!-- TEAM SECTION -->
+<section class="team-section">
+  <h3 class="section-title">Our Team</h3>
+
+  <div class="team-grid">
+
+    <div class="team-card">
+      <div class="team-photo">
+        <img src="assets/team1.jpg" />
+      </div>
+      <h4 class="team-name">Sarthak Sant</h4>
+      <p class="team-role">Backend Developer + ui/ux design</p>
+    </div>
+
+    <div class="team-card">
+      <div class="team-photo">
+        <img src="assets/team2.jpg" />
+      </div>
+      <h4 class="team-name">Mayank Rawat</h4>
+      <p class="team-role"> Authentication & Admin Module Developer</p>
+    </div>
+
+    <div class="team-card">
+      <div class="team-photo">
+        <img src="assets/team3.jpg" />
+      </div>
+      <h4 class="team-name">Rizul Pathania</h4>
+      <p class="team-role">Frontend Developer</p>
+    </div>
+
+    <div class="team-card">
+      <div class="team-photo">
+        <img src="assets/team4.jpg" />
+      </div>
+      <h4 class="team-name">Devdatta Patil</h4>
+      <p class="team-role">Reports & Deployment </p>
+    </div>
+
+  </div>
+</section>
+
+
+  <footer class="footer">© 2025 CivicTrack</footer>
+
+  <!-- ================= FIREBASE MODULE (helpers) ================= -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as fbSignOut, onAuthStateChanged as onAuthStateChangedFB, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, doc, updateDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD7bNZkNao0hBu5KbuPsk7OurgxD6gEAho",
+      authDomain: "civictrack-484.firebaseapp.com",
+      projectId: "civictrack-484",
+      storageBucket: "civictrack-484.firebasestorage.app",
+      messagingSenderId: "51770176614",
+      appId: "1:51770176614:web:e7ebb08172e1e7ec0969a7",
+      measurementId: "G-K3ZMYJXYBL"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    function computeStats(issuesArray) {
+      const totals = { total: 0, pending: 0, progress: 0, resolved: 0 };
+      totals.total = issuesArray.length;
+      issuesArray.forEach(i => {
+        const s = (i.status || "").toLowerCase();
+        if (s === "pending") totals.pending++;
+        else if (s === "in progress" || s === "progress") totals.progress++;
+        else if (s === "resolved") totals.resolved++;
+      });
+      return totals;
+    }
+
+    window.firebaseHelpers = {
+      addIssue: async (issueData) => {
+        const docRef = await addDoc(collection(db, "issues"), {
+          ...issueData,
+          status: "Pending",
+          createdAt: serverTimestamp()
+        });
+        return docRef.id;
+      },
+
+      subscribeIssues: (callback) => {
+        const q = query(collection(db, "issues"), orderBy("createdAt", "desc"));
+        return onSnapshot(q, (snapshot) => {
+          const arr = snapshot.docs.map(d => {
+            const data = d.data();
+            const createdAt = data.createdAt && data.createdAt.toDate ? data.createdAt.toDate() : null;
+            return { id: d.id, ...data, createdAt };
+          });
+          const stats = computeStats(arr);
+          callback(arr, stats);
+        }, (err) => {
+          console.error("subscribeIssues error:", err);
+        });
+      },
+
+      updateIssueStatus: async (issueId, newStatus) => {
+        const ref = doc(db, "issues", issueId);
+        await updateDoc(ref, { status: newStatus });
+      },
+
+      signInWithGoogle: async () => {
+        const provider = new GoogleAuthProvider();
+        return signInWithPopup(auth, provider);
+      },
+
+      signOut: async () => {
+        return fbSignOut(auth);
+      },
+
+      signInWithEmail: async (email, password) => {
+        return signInWithEmailAndPassword(auth, email, password);
+      },
+
+      signUpWithEmail: async (email, password) => {
+        return createUserWithEmailAndPassword(auth, email, password);
+      },
+
+      onAuthStateChanged: (cb) => {
+        return onAuthStateChangedFB(auth, cb);
+      },
+
+      _auth: auth,
+      _db: db
+    };
+
+    console.log("firebaseHelpers ready");
+  </script>
+
+  <!-- ================= REACT (Babel) App — uses firebaseHelpers ================= -->
+  <script type="text/babel">
+    const categoriesDefault = ["All", "Roads", "Garbage", "Water", "Electricity", "Other"];
+    const ADMIN_EMAILS = ["sarthaksant2004@gmail.com"];
+
+    function Stats({stats}) {
+      return (
+        <div className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-card-header">
+              <div className="stat-icon">📌</div>
+              <div className="stat-value">{stats ? stats.total : 0}</div>
+            </div>
+            <div className="stat-label">Total Issues</div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-card-header">
+              <div className="stat-icon">⚙️</div>
+              <div className="stat-value">{stats ? stats.progress : 0}</div>
+            </div>
+            <div className="stat-label">In Progress</div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-card-header">
+              <div className="stat-icon">✔️</div>
+              <div className="stat-value">{stats ? stats.resolved : 0}</div>
+            </div>
+            <div className="stat-label">Resolved</div>
+          </div>
+        </div>
+      );
+    }
+
+    function CategoryFilter({categories, active, onChange}) {
+      return (
+        <div className="categories">
+          {categories.map(cat => (
+            <button
+              key={cat}
+              className={`category-btn ${active === cat ? "active" : ""}`}
+              onClick={() => onChange(cat)}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      );
+    }
+
+    function IssuesGrid({issues, onUpdateStatus, isAdmin}) {
+      return (
+        <div className="issues-grid">
+          {issues.map(issue => (
+            <div key={issue.id} className="issue-card">
+              <div className="issue-image">
+                {issue.image ? <img src={issue.image} /> : <div style={{height: '100%', display:'flex', alignItems:'center', justifyContent:'center'}}>No image</div>}
+                <span className={`issue-status ${
+                  (issue.status === "Pending") ? "status-pending"
+                  : (issue.status === "In Progress") ? "status-progress"
+                  : "status-resolved"
+                }`}>
+                  {issue.status}
+                </span>
+              </div>
+
+              <div className="issue-content">
+                <h4 className="issue-title">{issue.title}</h4>
+                <div className="issue-location">📍 {issue.location}</div>
+
+                <div className="issue-footer">
+                  <div className="issue-interactions">
+                    <div className="interaction">👍 {issue.upvotes || 0}</div>
+                    <div className="interaction">💬 {issue.comments || 0}</div>
+                  </div>
+
+                  <div style={{display:'flex', gap:'0.5rem', alignItems:'center'}}>
+                    <div style={{fontWeight:600}}>{issue.category}</div>
+                    {isAdmin ? (
+                      <div style={{display:'flex', gap:'0.5rem', marginLeft:'1rem'}}>
+                        <button className="filter-btn" onClick={() => onUpdateStatus(issue.id, "In Progress")}>In Progress</button>
+                        <button className="filter-btn" onClick={() => onUpdateStatus(issue.id, "Resolved")}>Resolve</button>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+
+    function App() {
+      const [issues, setIssues] = React.useState([]);
+      const [stats, setStats] = React.useState({ total:0, progress:0, resolved:0 });
+      const [activeCategory, setActiveCategory] = React.useState("All");
+      const [categories, setCategories] = React.useState(categoriesDefault);
+      const [user, setUser] = React.useState(null);
+      const [isAdmin, setIsAdmin] = React.useState(false);
+
+      React.useEffect(() => {
+        // subscribe to auth changes (optional)
+        if (window.firebaseHelpers && window.firebaseHelpers.onAuthStateChanged) {
+          window.firebaseHelpers.onAuthStateChanged((u) => {
+            setUser(u);
+            setIsAdmin(u && ADMIN_EMAILS.includes(u.email));
+            // update navbar user if available
+            try { window.updateNavUser && window.updateNavUser(u); } catch(e) {}
+          });
+        }
+
+        // subscribe to issues
+        let unsub = null;
+        if (window.firebaseHelpers && window.firebaseHelpers.subscribeIssues) {
+          unsub = window.firebaseHelpers.subscribeIssues((arr, computedStats) => {
+            setIssues(arr);
+            setStats(computedStats);
+
+            // dynamically set categories from issues
+            const cats = new Set(categoriesDefault);
+            arr.forEach(i => { if (i.category) cats.add(i.category); });
+            setCategories([...cats]);
+          });
+        }
+
+        return () => { if (unsub) unsub(); };
+      }, []);
+
+      const filtered = issues.filter(i => activeCategory === "All" ? true : i.category === activeCategory);
+
+      const handleUpdateStatus = async (id, newStatus) => {
+        if (!window.firebaseHelpers) return;
+        await window.firebaseHelpers.updateIssueStatus(id, newStatus);
+      };
+
+      return (
+        <>
+          <Stats stats={stats} />
+          <CategoryFilter categories={categories} active={activeCategory} onChange={setActiveCategory} />
+
+          {/* Render the Issues heading and wrapper inside React so nav scroll works */}
+          <h3 className="section-title" style={{marginTop: '3rem'}}>Recent Issues</h3>
+          <div id="issues-section">
+            <IssuesGrid issues={filtered} onUpdateStatus={handleUpdateStatus} isAdmin={isAdmin} />
+          </div>
+        </>
+      );
+    }
+
+    // Render the app inside a wrapper positioned AFTER the Categories heading
+    (function mountApp() {
+      const combinedRoot = document.createElement("div");
+      combinedRoot.id = "civictrack-app-root";
+
+      // insert combinedRoot AFTER the categories title heading
+      const categoriesTitle = document.getElementById("categories-title");
+      if (categoriesTitle && categoriesTitle.parentNode) {
+        categoriesTitle.parentNode.insertBefore(combinedRoot, categoriesTitle.nextSibling);
+      } else {
+        // fallback: replace stats-root if categories-title not found
+        const statsRoot = document.getElementById("stats-root");
+        if (statsRoot) statsRoot.replaceWith(combinedRoot);
+      }
+
+      ReactDOM.createRoot(document.getElementById("civictrack-app-root")).render(<App />);
+    })();
+  </script>
+
+
+  <script>
+const input = document.getElementById("locationInput");
+const suggestionsBox = document.getElementById("suggestions");
+
+input.addEventListener("input", async () => {
+  const query = input.value;
+  if (query.length < 3) {
+    suggestionsBox.innerHTML = "";
+    return;
+  }
+
+  const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`);
+  const data = await res.json();
+
+  suggestionsBox.innerHTML = "";
+
+  data.slice(0, 5).forEach(place => {
+    const div = document.createElement("div");
+    div.className = "suggestion-item";
+    div.innerText = place.display_name;
+
+    div.onclick = () => {
+      input.value = place.display_name;
+      suggestionsBox.innerHTML = "";
+
+      console.log("Lat:", place.lat, "Lng:", place.lon);
+    };
+
+    suggestionsBox.appendChild(div);
+  });
+});
+</script>
+
+  <!-- ================= Non-module JS: nav, form, signin modal (uses firebaseHelpers) ================= -->
+  <script>
+    // Update navbar to show user avatar / menu
+    window.updateNavUser = function(user) {
+      const nav = document.getElementById('mainNav');
+      if (!nav) return;
+      if (user && user.email) {
+        const isAdmin = ["sarthaksant2004@gmail.com"].includes(user.email);
+        // build user button
+        const initials = (user.displayName ? user.displayName.split(' ').map(s => s[0]).join('') : (user.email.split('@')[0].slice(0,2))).toUpperCase();
+        nav.innerHTML = `
+          <button class="nav-btn" data-target="hero">Home</button>
+          <button class="nav-btn" data-target="issues-section">Issues</button>
+          <button class="nav-btn" data-target="report-section">Report</button>
+          <div class="user-wrap">
+            <button id="userBtn" class="user-btn" title="${user.email}">
+              <span class="user-initials">${initials}</span>
+            </button>
+            <div id="userMenu" class="user-menu hidden">
+              <div class="user-menu-item email">${user.email} ${isAdmin?'<span class="admin-badge">ADMIN</span>':''}</div>
+              <button id="myIssues" class="user-menu-item">My Issues</button>
+              <button id="signOutBtn" class="user-menu-item">Sign Out</button>
+            </div>
+          </div>
+        `;
+        // attach listeners
+        document.querySelectorAll(".nav-btn").forEach(btn=> btn.addEventListener('click', navClick));
+        const userBtn = document.getElementById('userBtn');
+        const userMenu = document.getElementById('userMenu');
+        if (userBtn) userBtn.addEventListener('click', ()=> userMenu.classList.toggle('hidden'));
+        const signOutBtn = document.getElementById('signOutBtn');
+        if (signOutBtn) signOutBtn.addEventListener('click', async ()=> {
+          await window.firebaseHelpers.signOut();
+          alert('Signed out');
+        });
+        const myIssues = document.getElementById('myIssues');
+        if (myIssues) myIssues.addEventListener('click', ()=> {
+          // scroll to issues and filter by user's email (simple client-side filter)
+          document.getElementById('issues-section').scrollIntoView({behavior:'smooth'});
+          // Optionally open a modal showing only user's issues — left as improvement
+        });
+      } else {
+        // not signed in
+        nav.innerHTML = `
+          <button class="nav-btn" data-target="hero">Home</button>
+          <button class="nav-btn" data-target="issues-section">Issues</button>
+          <button class="nav-btn" data-target="report-section">Report</button>
+          <button class="btn-signin" id="signinBtn">Sign In</button>
+        `;
+        document.querySelectorAll(".nav-btn").forEach(btn=> btn.addEventListener('click', navClick));
+        const signin = document.getElementById('signinBtn');
+        if (signin) signin.addEventListener('click', openAuthModal);
+      }
+    };
+
+    // smooth nav handler
+    function navClick(e) {
+      const id = e.currentTarget.dataset.target;
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // open modal
+    function openAuthModal() {
+      const modal = document.getElementById('authModal');
+      if (modal) modal.classList.add('active');
+    }
+
+    // close modal
+    function closeAuthModal() {
+      const modal = document.getElementById('authModal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+      // initial nav wiring
+      document.querySelectorAll(".nav-btn").forEach(btn => btn.addEventListener("click", navClick));
+      const signin = document.getElementById('signinBtn');
+      if (signin) signin.addEventListener('click', openAuthModal);
+
+      // auth modal markup injection (so we don't require manual edits)
+      if (!document.getElementById('authModal')) {
+        const modalHtml = `
+          <div id="authModal" class="auth-modal">
+            <div class="auth-modal-card">
+              <button class="auth-close" id="authClose">&times;</button>
+              <div class="auth-grid">
+                <div class="auth-left">
+                  <h3>Welcome to CivicTrack</h3>
+                  <p>Sign in to report issues, track your reports and get updates from your community.</p>
+                  <div class="oauth-row">
+                    <button id="googleSignIn" class="btn-google">
+                      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" /> Sign in with Google
+                    </button>
+                  </div>
+                  <div class="or-sep"><span>OR</span></div>
+                </div>
+
+                <div class="auth-right">
+                  <div class="tab-row">
+                    <button id="tabSignIn" class="tab active">Sign In</button>
+                    <button id="tabSignUp" class="tab">Sign Up</button>
+                  </div>
+
+                  <form id="emailSignInForm" class="auth-form">
+                    <label>Email</label>
+                    <input type="email" id="si_email" required />
+                    <label>Password</label>
+                    <input type="password" id="si_pass" required />
+                    <button type="submit" class="btn-primary">Sign In</button>
+                    <div class="auth-small">Forgot password? (coming soon)</div>
+                  </form>
+
+                  <form id="emailSignUpForm" class="auth-form hidden">
+                    <label>Full name</label>
+                    <input type="text" id="su_name" required />
+                    <label>Email</label>
+                    <input type="email" id="su_email" required />
+                    <label>Password</label>
+                    <input type="password" id="su_pass" required />
+                    <button type="submit" class="btn-primary">Create account</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        // modal event listeners
+        document.getElementById('authClose').addEventListener('click', closeAuthModal);
+        document.getElementById('googleSignIn').addEventListener('click', async () => {
+          try {
+            await window.firebaseHelpers.signInWithGoogle();
+            closeAuthModal();
+          } catch (err) {
+            alert('Google sign-in failed: ' + err.message);
+            console.error(err);
+          }
+        });
+
+        // tabs
+        const tabSignIn = document.getElementById('tabSignIn');
+        const tabSignUp = document.getElementById('tabSignUp');
+        const signInForm = document.getElementById('emailSignInForm');
+        const signUpForm = document.getElementById('emailSignUpForm');
+
+        tabSignIn.addEventListener('click', ()=> {
+          tabSignIn.classList.add('active'); tabSignUp.classList.remove('active');
+          signInForm.classList.remove('hidden'); signUpForm.classList.add('hidden');
+        });
+        tabSignUp.addEventListener('click', ()=> {
+          tabSignUp.classList.add('active'); tabSignIn.classList.remove('active');
+          signUpForm.classList.remove('hidden'); signInForm.classList.add('hidden');
+        });
+
+        // sign in submit
+        signInForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const email = document.getElementById('si_email').value.trim();
+          const pass = document.getElementById('si_pass').value;
+          try {
+            await window.firebaseHelpers.signInWithEmail(email, pass);
+            closeAuthModal();
+          } catch (err) {
+            alert('Sign in failed: ' + err.message);
+            console.error(err);
+          }
+        });
+
+        // sign up submit
+        signUpForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const name = document.getElementById('su_name').value.trim();
+          const email = document.getElementById('su_email').value.trim();
+          const pass = document.getElementById('su_pass').value;
+          try {
+            const res = await window.firebaseHelpers.signUpWithEmail(email, pass);
+            // update displayName if available
+            try { await res.user.updateProfile({ displayName: name }); } catch(_) {}
+            closeAuthModal();
+          } catch (err) {
+            alert('Sign up failed: ' + err.message);
+            console.error(err);
+          }
+        });
+      }
+
+      // attach form submit handler (report) using firebaseHelpers
+    document.querySelector(".btn-submit").addEventListener("click", async (e) => {
+    e.preventDefault();
+
+    console.log("SUBMIT CLICKED");
+    
+    const submitBtn = document.querySelector(".btn-submit");
+    submitBtn.innerText = "Submitting...";
+    submitBtn.disabled = true;
+
+    const title = document.getElementById("title").value.trim();
+    const category = document.getElementById("category").value;
+    const location = document.getElementById("locationInput").value.trim();
+    const description = document.querySelector("textarea[name='description']").value.trim();
+
+    const isAI = document.getElementById("aiBtn").classList.contains("active");
+    let image = "";
+
+    // Load explicitly dependent on the mode
+    if (isAI) {
+        image = detectedImagePath;
+    } else {
+        const manualInput = document.getElementById("manualImageInput");
+        if (manualInput.files.length > 0) {
+            const formData = new FormData();
+            formData.append("image", manualInput.files[0]);
+            try {
+                // Upload manual image to Flask to leverage existing storage path
+                const res = await fetch("http://127.0.0.1:5000/upload", {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    image = data.path; // already absolute via recent app.py change
+                }
+            } catch (err) {
+                console.error("Manual image upload failed:", err);
+            }
+        }
+    }
+
+    if (!title || !location || !description || ((!isAI) && category === "")) {
+        alert("Fill all required fields");
+        submitBtn.innerText = "Submit Issue";
+        submitBtn.disabled = false;
+        return;
+    }
+
+    if (isAI && !image) {
+        alert("Please upload an image for AI detection.");
+        submitBtn.innerText = "Submit Issue";
+        submitBtn.disabled = false;
+        return;
+    }
+
+    try {
+        await window.firebaseHelpers.addIssue({
+            title,
+            category,
+            location,
+            description,
+            image
+        });
+
+        alert("✅ Issue submitted!");
+
+        document.getElementById("reportForm").reset();
+        detectedImagePath = "";
+        const predText = document.getElementById("predictionResult");
+        if (predText) predText.innerText = "";
+        
+        // Reset image previews / texts etc
+        if (document.getElementById("imageInput")) document.getElementById("imageInput").value = "";
+        if (document.getElementById("manualImageInput")) document.getElementById("manualImageInput").value = "";
+
+    } catch (err) {
+        console.error(err);
+        alert("❌ Error submitting issue");
+    } finally {
+        submitBtn.innerText = "Submit Issue";
+        submitBtn.disabled = false;
+    }
+});
+
+      // keep nav in sync with auth state
+      if (window.firebaseHelpers && window.firebaseHelpers.onAuthStateChanged) {
+        window.firebaseHelpers.onAuthStateChanged((u) => {
+          window.updateNavUser && window.updateNavUser(u);
+        });
+      }
+    });
+  </script>
+
+  <script>
+let slideIndex = 0;
+const slides = document.querySelectorAll(".about-slide");
+
+function showSlides() {
+  slides.forEach((s, i) => s.style.opacity = i === slideIndex ? "1" : "0");
+  slideIndex = (slideIndex + 1) % slides.length;
+}
+
+setInterval(showSlides, 4000);
+showSlides();
+
+
+
+const imageInput = document.getElementById("imageInput");
+const predictionText = document.getElementById("predictionResult");
+
+let detectedImagePath = "";
+
+if (imageInput) {
+    imageInput.addEventListener("change", async () => {
+        const file = imageInput.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("image", file);
+
+        if (predictionText) {
+            predictionText.innerText = "Detecting...";
+        }
+
+        try {
+            const res = await fetch("http://127.0.0.1:5000/upload", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await res.json();
+
+            console.log("API RESPONSE:", data);  // 🔥 DEBUG
+
+            if (data.ok) {
+                if (predictionText) {
+                    predictionText.innerText =
+                        `Detected: ${data.prediction} (${data.detections})`;
+                }
+
+                detectedImagePath = data.path;
+
+                document.getElementById("category").value = data.prediction;
+                
+                // Auto-fill title
+                const titleInput = document.getElementById("title");
+                if (!titleInput.value) {
+                    titleInput.value = `Detected ${data.prediction} Issue`;
+                }
+            } else {
+                if (predictionText) {
+                    predictionText.innerText = data.error;
+                }
+            }
+
+        } catch (err) {
+            console.error(err);
+            if (predictionText) {
+                predictionText.innerText = "Server error";
+            }
+        }
+    });
+}
+    
+</script>
+
+<script>
+// Theme Toggle Logic
+const themeToggleBtn = document.getElementById('themeToggleBtn');
+let isLightMode = localStorage.getItem('theme') === 'light';
+
+if (isLightMode) {
+    document.documentElement.setAttribute('data-theme', 'light');
+    if(themeToggleBtn) themeToggleBtn.innerText = '🌙';
+}
+
+if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+        isLightMode = !isLightMode;
+        if (isLightMode) {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+            themeToggleBtn.innerText = '🌙';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'dark');
+            themeToggleBtn.innerText = '🌞';
+        }
+        
+        themeToggleBtn.style.transform = 'scale(0.5) rotate(180deg)';
+        setTimeout(() => themeToggleBtn.style.transform = 'scale(1) rotate(0deg)', 200);
+    });
+}
+
+  // MODE SWITCHING
+const aiBtn = document.getElementById("aiBtn");
+const manualBtn = document.getElementById("manualBtn");
+const aiSection = document.getElementById("aiSection");
+const manualImageSection = document.getElementById("manualImageSection");
+const modeSlider = document.getElementById("modeSlider");
+
+aiBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    aiSection.style.display = "block";
+    if (manualImageSection) manualImageSection.style.display = "none";
+    aiBtn.classList.add("active");
+    manualBtn.classList.remove("active");
+    if(modeSlider) modeSlider.style.transform = "translateX(0)";
+});
+
+manualBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    aiSection.style.display = "none";
+    if (manualImageSection) manualImageSection.style.display = "block";
+    manualBtn.classList.add("active");
+    aiBtn.classList.remove("active");
+    if(modeSlider) modeSlider.style.transform = "translateX(100%)";
+});
+</script>
+
+
+</body>
+</html>
